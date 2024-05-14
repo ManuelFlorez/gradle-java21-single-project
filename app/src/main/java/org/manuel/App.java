@@ -3,12 +3,62 @@
  */
 package org.manuel;
 
+import org.manuel.entities.Application;
+import org.manuel.entities.ProjectType;
+import org.manuel.entities.Project;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
+
+    private static Mono<List<String[]>>getProjects() {
+        String[][]projects = {
+                {
+                        ProjectType.FRONTEND.name(),
+                        "https://github.com/ManuelFlorez/frontend"
+                },
+                {
+                        ProjectType.BACKEND.name(),
+                        "https://github.com/ManuelFlorez/backend"
+                },
+                {
+                        ProjectType.DATABASE.name(),
+                        "https://github.com/ManuelFlorez/database"
+                }
+        };
+        return Mono.just(Arrays.asList(projects));
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        getProjects()
+                .map(getApp())
+                .map(Application::getProjects)
+                .map(App::process)
+                .map(Flux::subscribe)
+                .subscribe();
+    }
+
+    private static Function<List<String[]>, Application> getApp() {
+        return projects -> new Application("app", getList(projects));
+    }
+
+    private static List<Project> getList(List<String[]> projects) {
+        return projects.stream().map(buildProjectFunction()).toList();
+    }
+
+    private static Flux<String> process(List<Project> projects) {
+        return Flux.fromIterable(projects)
+                .map(Project::toString).log();
+    }
+
+    private static Function<String[], Project> buildProjectFunction() {
+        return project -> new Project(
+                project[0],
+                project[1]
+        );
     }
 }

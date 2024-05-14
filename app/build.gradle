@@ -18,11 +18,16 @@ repositories {
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
+    testImplementation 'io.projectreactor:reactor-test:3.6.5'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
     implementation libs.guava
+    implementation 'io.projectreactor:reactor-core:3.6.5'
+    implementation 'io.projectreactor:reactor-tools:3.6.5'
+
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
